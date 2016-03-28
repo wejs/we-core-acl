@@ -55,3 +55,15 @@ module.exports = {
     info: console.log
   }
 }
+
+
+// test bootstrap file
+// make config dir for tests
+var fs = require('fs');
+if(!fs.existsSync(path.resolve(__dirname, '..', 'config'))){
+   fs.mkdirSync(path.resolve(__dirname, '..', 'config'), 0766, function(err){
+     if(err){
+       console.error(err);
+     }
+   });
+ }
