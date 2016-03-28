@@ -197,6 +197,43 @@ describe('we-core-acl', function () {
     });
   });
 
+  describe('logMiddlewareForbiddenRequest', function () {
+    it('acl.logMiddlewareForbiddenRequest should run log with authenticated user', function (done) {
+      acl.logMiddlewareForbiddenRequest.bind({
+        app: {
+          log: {
+            info: function(text, userId) {
+              assert.equal(text, 'ACL:canMiddleware: forbidden for user id: ');
+              assert.equal(userId, 1);
+              done();
+            }
+          }
+        }
+      })({
+        user: { id: 1 }
+      }, {
+        locals: { permission: 'do_something' }
+      });
+    });
+
+    it('acl.logMiddlewareForbiddenRequest should run log with unAuthenticated user', function (done) {
+      acl.logMiddlewareForbiddenRequest.bind({
+        app: {
+          log: {
+            info: function(text, permission) {
+              assert.equal(text, 'ACL:canMiddleware: forbidden for unAuthenticated user:');
+              assert.equal(permission, 'do_something');
+              done();
+            }
+          }
+        }
+      })({}, {
+        locals: { permission: 'do_something' }
+      });
+    });
+  });
+
+
   after(function (done) {
     fs.unlink(acl.app.config.rolesConfigFile, done);
   });
