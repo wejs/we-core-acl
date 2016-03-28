@@ -1,6 +1,6 @@
 # we-core-acl 
 
-[![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url] [![Coverage percentage][coveralls-image]][coveralls-url]
+[![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Code Climate](https://codeclimate.com/github/wejs/we-core-acl/badges/gpa.svg)](https://codeclimate.com/github/wejs/we-core-acl) [![Coverage Status](https://coveralls.io/repos/github/wejs/we-core-acl/badge.svg?branch=master)](https://coveralls.io/github/wejs/we-core-acl?branch=master)
 
 > Simple and powerfull access control list (ACL) module exported from we.js core
 
