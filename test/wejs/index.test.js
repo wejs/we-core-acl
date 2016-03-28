@@ -68,7 +68,7 @@ describe('we-core-acl:wejs', function () {
       }, function (err) {
         if (err) throw(err);
         assert(true, 'should run then callback');
-        acl.app.config.disabled = false;
+        acl.app.config.acl.disabled = false;
         done();
       });
     });
@@ -78,7 +78,7 @@ describe('we-core-acl:wejs', function () {
       var req = {
         acl: acl,
         userRolesIsLoad: true,
-        userRoleNames: ['authenticated']
+        userRoleNames: ['unAuthenticated']
       }
 
       acl.canMiddleware(req, {
@@ -86,14 +86,57 @@ describe('we-core-acl:wejs', function () {
           isAdmin: true,
           permission: 'access_admin'
         },
+        forbidden: function() {
+          assert(true, 'should run the forbidden');
+          done();
+        }
+      }, function () {});
+    });
+
+    it('acl.canMiddleware should run res.serverError if loadUserContextRoles return error', function (done) {
+      acl.app.config.acl.disabled = false;
+
+      var loadUserContextRoles = acl.loadUserContextRoles;
+      acl.loadUserContextRoles = function (req, res, cb) {
+        cb('error');
+      }
+
+      var req = { we: { acl: acl } };
+
+      acl.canMiddleware(req, {
+        locals: {
+          permission: 'access_admin'
+        },
         forbidden: function(err) {
           throw err;
         }
       }, function (err) {
-        if (err) throw(err);
-        assert(true, 'should run then callback');
+        assert.equal(err, 'error');
+        acl.loadUserContextRoles = loadUserContextRoles;
+        acl.app.config.acl.disabled = true;
         done();
       });
+    });
+
+
+    it('acl.canMiddleware should log and run forbidden for unAuthorized access', function (done) {
+      acl.app.config.acl.disabled = false;
+
+      var req = {
+        acl: acl,
+        userRolesIsLoad: true,
+        userRoleNames: ['unAuthenticated']
+      }
+
+      acl.canMiddleware(req, {
+        locals: {
+          permission: 'access_somethig'
+        },
+        forbidden: function() {
+          acl.app.config.acl.disabled = true;
+          done();
+        }
+      }, function () {});
     });
   });
 

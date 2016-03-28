@@ -28,6 +28,18 @@ describe('we-core-acl', function () {
         })
       });
     });
+
+    it('acl.writeRolesToConfigFile should run done with error if cant create the file', function (done) {
+
+      var rolesConfigFile = acl.app.config.rolesConfigFile;
+      acl.app.config.rolesConfigFile = rolesConfigFile+'/asdasd/asdasda';
+
+      acl.writeRolesToConfigFile(function (err){
+        assert(err);
+        acl.app.config.rolesConfigFile = rolesConfigFile;
+        done();
+      });
+    });
   });
 
   describe('canStatic', function () {
@@ -133,6 +145,26 @@ describe('we-core-acl', function () {
         done();
       });
     });
+
+    it('acl.createRole register one role and save in config file', function (done) {
+
+      acl.app.config.autoUpdateRolesConfig = true;
+      assert(!acl.roles.teacher44, 'not set after run the create');
+
+      acl.createRole('teacher44', function (err, role, old){
+        if (err) throw err;
+        assert(!old);
+        assert(acl.roles.teacher44);
+        assert(!acl.roles.teacher44.isSystemRole);
+
+        var file = fs.readFileSync(acl.app.config.rolesConfigFile);
+        assert(file.indexOf('teacher44') > -1);
+
+        acl.app.config.autoUpdateRolesConfig = false;
+
+        done();
+      });
+    });
   });
 
   describe('deleteRole', function () {
@@ -149,14 +181,34 @@ describe('we-core-acl', function () {
         done();
       });
     });
+
+    it('acl.deleteRole should delete one role and update config roles file', function (done) {
+      acl.app.config.autoUpdateRolesConfig = true;
+
+      acl.roles.teacher55 = {
+        name: 'teacher55',
+        permissions: []
+      }
+
+      acl.deleteRole('teacher55', function (err){
+        if (err) throw err;
+        assert(!acl.roles.teacher55);
+
+        var file = fs.readFileSync(acl.app.config.rolesConfigFile);
+        assert(file.indexOf('teacher55') == -1);
+
+        acl.app.config.autoUpdateRolesConfig = false;
+
+        done();
+      });
+    });
   });
 
   describe('addPermissionToRole', function () {
     it('acl.addPermissionToRole should add one permission to role', function (done) {
 
       acl.roles.teacher6 = {
-        name: 'teacher6',
-        permissions: []
+        name: 'teacher6'
       }
 
       acl.createRole('teacher6', function (err){
@@ -172,24 +224,76 @@ describe('we-core-acl', function () {
         });
       });
     });
+
+    it('acl.addPermissionToRole should set permissions and update config file', function (done) {
+      acl.app.config.autoUpdateRolesConfig = true;
+
+      acl.createRole('teacher123', function (err){
+        if (err) throw err;
+        assert(acl.roles.teacher123);
+
+        acl.addPermissionToRole('teacher123', 'can_fly', function (err) {
+          if (err) throw err;
+
+          assert(acl.roles.teacher123.permissions.indexOf('can_fly') > -1);
+
+          var file = fs.readFileSync(acl.app.config.rolesConfigFile);
+          assert(file.indexOf('teacher123') > -1);
+          acl.app.config.autoUpdateRolesConfig = false;
+
+          done();
+        });
+      });
+    });
   });
 
   describe('removePermissionFromRole', function () {
     it('acl.removePermissionFromRole should remove one permission from role', function (done) {
-
       acl.roles.teacher7 = {
         name: 'teacher7',
         permissions: ['run_fast']
       }
 
-      acl.createRole('teacher7',function (err){
+      acl.removePermissionFromRole('teacher7', 'run_fast', function (err) {
         if (err) throw err;
-        assert(acl.roles.teacher7);
+        assert(acl.roles.teacher7.permissions.indexOf('run_fast') === -1);
+        done();
+      });
+    });
 
-        acl.removePermissionFromRole('teacher7', 'run_fast', function (err) {
+    it('acl.removePermissionFromRole should ship if role dont have permissions', function (done) {
+      acl.roles.teacher77 = { name: 'teacher77' };
+      acl.removePermissionFromRole('teacher77', 'run_fast', function (err) {
+        if (err) throw err;
+        assert(!acl.roles.teacher77.permissions);
+        done();
+      });
+
+    });
+
+    it('acl.removePermissionFromRole should remove one permission from role and update config file', function (done) {
+      acl.app.config.autoUpdateRolesConfig = true;
+
+      acl.createRole('teacher17',function (err){
+        if (err) throw err;
+        assert(acl.roles.teacher17);
+
+        acl.roles.teacher17 = {
+          name: 'teacher17',
+          permissions: ['run_fastrr']
+        }
+
+        var file = fs.readFileSync(acl.app.config.rolesConfigFile);
+        assert(file.indexOf('teacher17') > -1);
+
+        acl.removePermissionFromRole('teacher17', 'run_fastrr', function (err) {
           if (err) throw err;
 
-          assert(acl.roles.teacher7.permissions.indexOf('run_fast') > -1);
+          assert(acl.roles.teacher17.permissions.indexOf('run_fastrr') === -1);
+
+          var file = fs.readFileSync(acl.app.config.rolesConfigFile);
+          assert(file.indexOf('run_fastrr') === -1);
+          acl.app.config.autoUpdateRolesConfig = false;
 
           done();
         });
@@ -232,7 +336,6 @@ describe('we-core-acl', function () {
       });
     });
   });
-
 
   after(function (done) {
     fs.unlink(acl.app.config.rolesConfigFile, done);
