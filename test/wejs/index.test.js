@@ -156,7 +156,8 @@ describe('we-core-acl:wejs', function () {
       });
     });
 
-    it('acl.loadUserContextRoles should return [\'unAuthenticated\'] in callback if req.user not is set', function (done) {
+    it('acl.loadUserContextRoles should return [\'unAuthenticated\'] in callback if req.user not is set',
+    function (done) {
 
       acl.loadUserContextRoles({
         userRoleNames: []
@@ -172,6 +173,7 @@ describe('we-core-acl:wejs', function () {
 
     it('acl.loadUserContextRoles should SET authenticated role with user', function (done) {
       var req = {
+        userRoleNames: [],
         user: {
           getRoles: function() {
             // fake promisse
