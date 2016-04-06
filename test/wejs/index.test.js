@@ -219,4 +219,29 @@ describe('we-core-acl:wejs', function () {
       done();
     });
   });
+
+  describe('requestCan', function() {
+
+
+    it('requestCan should check access with this', function (done) {
+      var requestCan = acl.requestCan;
+      requestCan.bind({
+        req: {
+          userRoleNames: ['ninja']
+        },
+        res: {
+
+        },
+        acl: {
+          canStatic: function(p, rs) {
+            assert.equal('do_it', p);
+            assert.equal(1, rs.length);
+            assert.equal('ninja', rs[0]);
+
+            done();
+          }
+        }
+      })('do_it');
+    });
+  });
 });
