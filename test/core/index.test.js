@@ -95,9 +95,14 @@ describe('we-core-acl', function () {
   describe('can', function () {
     it('acl.can will check access and run callback with result', function (done) {
       acl.can('access_admin', ['administrator'], function(err, result){
-        assert(result, true);
+        assert.equal(result, true);
         done();
       });
+    });
+
+    it('acl.can will check access and return without callback', function (done) {
+      assert.equal(true, acl.can('access_admin', ['administrator']));
+      done();
     });
   });
 

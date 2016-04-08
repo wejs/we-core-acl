@@ -41,17 +41,24 @@ var options = {
 acl.init(options, function(){
   // acl is ready to use
 
-  is (acl.canStatic('fly_fast', ['bird'])) {
+  is (acl.can('fly_fast', ['bird'])) {
     // can fly fast, this will not run in this example
   } else {
     // birds cant fly fast
   }
 
-  is (acl.canStatic('fly_fast', ['jet'])) {
+  is (acl.can('fly_fast', ['jet'])) {
     // jet can fly fast
   } else {
     // this not run in this example
   }
+
+  is (acl.can('fly_fast', ['jet', 'bird'])) {
+    // Bird Jets can fly fast
+  } else {
+    // this not run in this example
+  }
+
 });
 
 ```
