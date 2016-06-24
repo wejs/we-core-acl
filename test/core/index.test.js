@@ -342,6 +342,65 @@ describe('we-core-acl', function () {
     });
   });
 
+  it ('readme example should return rigth results', function() {
+    var ACL = require('../../lib');
+    var acl = new ACL();
+
+    var options = {
+      config: {
+        permissions: {
+          'fly_fast': {
+            'title': 'Fly super fast'
+          }
+        },
+        // roles with permissions
+        roles: {
+          administrator: {
+            // administrators can do everything and dont need permissions
+            name: "Administrator"
+          },
+          bird: {
+            name: 'bird',
+            permissions: []
+          },
+          jet: {
+            name: 'jet',
+            permissions: [
+              'fly_fast'
+            ]
+          }
+        }        
+      }
+    }
+
+    acl.init(options, function(){
+      // acl is ready to use
+
+      if (acl.can('fly_fast', ['bird'])) {
+        // can fly fast, this will not run in this example
+        assert(false, 'can fly fast, this will not run in this example')
+      } else {
+        // birds cant fly fast
+      }
+
+      if (acl.can('fly_fast', ['jet'])) {
+        // jet can fly fast
+      } else {
+        // this not run in this example
+        assert(false, 'this not run in this example')
+      }
+
+      if (acl.can('fly_fast', ['jet', 'bird'])) {
+        // Bird Jets can fly fast
+      } else {
+        assert(false, 'this not run in this example')
+        // this not run in this example
+      }
+
+    });
+
+  })
+
   after(function (done) {
     fs.unlink(acl.app.config.rolesConfigFile, done);
   });
