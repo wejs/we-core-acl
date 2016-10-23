@@ -12,6 +12,12 @@ npm install --save we-core-acl
 
 ## Usage
 
+Test it in your browser:
+
+https://tonicdev.com/albertosouza/tonic-npm-we-core-acl
+
+### Example
+
 ```js
 var ACL = require('we-core-acl');
 var acl = new ACL();
